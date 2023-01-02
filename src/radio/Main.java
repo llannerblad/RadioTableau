@@ -9,11 +9,16 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException, ParseException {
 	// write your code here
         RadioData data = new RadioData();
-        Map<String, Long> channels = data.getChannels();
-        data.getChannelTableau(164);
+        Map<Long, String> channels = data.getChannels();
+        Map<Long, ProgramInfo> map = data.getChannelTableau(164);
 
-        for(Map.Entry<String,Long>it:channels.entrySet())
+        for(Map.Entry<Long,ProgramInfo>it:map.entrySet()){
+            System.out.println(it.getValue());
+            System.out.println(it.getValue().toString());
+        }
+        for(Map.Entry<Long,String>it:channels.entrySet())
             System.out.println(it.getValue()+", " + it.getKey());
+
     }
 
 

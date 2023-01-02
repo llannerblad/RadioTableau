@@ -19,8 +19,9 @@ public class RadioData {
         return parser.getParsedChannels(json);
     }
 
-    public void getChannelTableau(int channelId) throws IOException, InterruptedException, ParseException {
-        parser.getParsedChannelTableau(api.getChannelTableau(channelId));
+    public Map<Long, ProgramInfo> getChannelTableau(int channelId) throws IOException, InterruptedException, ParseException {
+        return parser.getParsedChannelTableau(api.getChannelTableau(channelId));
+
     }
 
 }
