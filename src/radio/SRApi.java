@@ -42,6 +42,7 @@ public class SRApi {
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
         long timestamp = 1671490800000L;
         Instant instant = Instant.ofEpochMilli(timestamp);
         LocalDateTime local = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
