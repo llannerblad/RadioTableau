@@ -1,6 +1,9 @@
 package radio;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +21,12 @@ public class MyTableModel extends AbstractTableModel {
         this.columnNames = columnNames;
 
         data = new ArrayList<>();
-        data.add(new ProgramInfo("Namn", "desc", "date1", "date2", "img", "title"));
 
     }
 
-   /* public void updateData(Map<Long, ProgramInfo> data){
+    public void setData(List<ProgramInfo> data) {
         this.data = data;
-    }*/
+    }
 
     @Override
     public int getRowCount() {
@@ -38,14 +40,22 @@ public class MyTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+
         return switch (columnIndex){
             case 0 -> data.get(rowIndex).getName();
-            case 1 -> data.get(rowIndex).getStartDate();
-            case 2 -> data.get(rowIndex).getEndDate();
+            case 1 -> data.get(rowIndex).getStartDate().format(formatter);
+            case 2 -> data.get(rowIndex).getEndDate().format(formatter);
             default -> "-";
         };
     }
     public String getColumnName(int column){
         return columnNames[column];
     }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return false;
+    }
+
 }

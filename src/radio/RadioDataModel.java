@@ -2,12 +2,15 @@ package radio;
 
 import org.json.simple.parser.ParseException;
 
-import javax.swing.*;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.*;
 
-public class RadioData {
+public class RadioDataModel {
 
     private SRParser parser;
     private SRApi api;
@@ -16,7 +19,9 @@ public class RadioData {
     Map<Long, String> extra;
     Map<Long, String> others;
 
-    public RadioData() throws IOException, ParseException, InterruptedException {
+    Map<Long, String> channels;
+
+    public RadioDataModel() throws IOException, ParseException, InterruptedException {
         this.parser = new SRParser();
         this.api = new SRApi();
         categorizeChannels();
@@ -29,7 +34,7 @@ public class RadioData {
 
     public void categorizeChannels() throws IOException, ParseException, InterruptedException {
         String json = api.getChannels();
-        Map<Long, String> channels = parser.getParsedChannels(json);
+        this.channels = parser.getParsedChannels(json);
         this.primary = new LinkedHashMap<>();
         this.p4 = new LinkedHashMap<>();
         this.extra = new LinkedHashMap<>();
@@ -69,9 +74,25 @@ public class RadioData {
         return primary;
     }
 
-    public Map<Long, ProgramInfo> getChannelTableau(int channelId) throws IOException, InterruptedException, ParseException {
-        return parser.getParsedChannelTableau(api.getChannelTableau(channelId));
+    public List<ProgramInfo> getChannelTableau(String channelName) throws IOException, InterruptedException, ParseException {
+        List<ProgramInfo> sortedList = new ArrayList<>();
 
+        for(Map.Entry<Long,String>item:channels.entrySet()){
+            if(item.getValue().contains(channelName)){
+                List<ProgramInfo> programList = parser.getParsedChannelTableau(api.getChannelTableau(item.getKey()));
+                  for (ProgramInfo program : programList) {
+                    LocalDateTime sixHoursBefore = LocalDateTime.now(ZoneId.systemDefault()).minusHours(6);
+                    LocalDateTime twelveHoursAfter = LocalDateTime.now(ZoneId.systemDefault()).plusHours(12);
+
+                    System.out.println(sixHoursBefore);
+                    if(program.getStartDate().isAfter(sixHoursBefore) && program.getStartDate().isBefore(twelveHoursAfter)){
+                        sortedList.add(program);
+                    }
+                }
+                return sortedList;
+            }
+        }
+        return sortedList;
     }
 
 }

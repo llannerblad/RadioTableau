@@ -15,6 +15,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -34,8 +36,12 @@ public class SRApi {
         return response.body();
     }
 
-    public String getChannelTableau(int channelId) throws IOException, InterruptedException {
-        String url = "https://api.sr.se/api/v2/scheduledepisodes?pagination=false&format=json&channelid="+ channelId;
+    public String getChannelTableau(Long channelId) throws IOException, InterruptedException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime fromDate= LocalDateTime.now().minusHours(6);
+        LocalDateTime toDate = LocalDateTime.now().plusHours(12);
+        String url = "https://api.sr.se/api/v2/scheduledepisodes?pagination=false&format=json&channelid="+
+                channelId + "&fromdate=" +fromDate.format(formatter)+ "&todate=" +toDate.format(formatter);
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -43,11 +49,6 @@ public class SRApi {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
-        long timestamp = 1671490800000L;
-        Instant instant = Instant.ofEpochMilli(timestamp);
-        LocalDateTime local = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        Date date = Date.from(instant);
-        //System.out.println(date);
         return response.body();
     }
 }

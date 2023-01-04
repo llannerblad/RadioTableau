@@ -1,20 +1,25 @@
 package radio;
 
+import java.time.LocalDateTime;
+
 public class ProgramInfo {
     private String name;
     private String description;
-    private String startDate;
-    private String endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String imageUrl;
     private String title;
+    private Long episodeId;
 
-    public ProgramInfo(String name, String description, String startDate, String endDate, String imageUrl, String title ){
+    public ProgramInfo(String name, String description, LocalDateTime startDate,
+                       LocalDateTime endDate, String imageUrl, String title, Long episodeId ){
         this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.imageUrl = imageUrl;
         this.title = title;
+        this.episodeId = episodeId;
     }
 
     public String getName() {
@@ -25,11 +30,11 @@ public class ProgramInfo {
         return description;
     }
 
-    public String getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public String getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
@@ -41,6 +46,10 @@ public class ProgramInfo {
         return title;
     }
 
+    public Long getEpisodeId() {
+        return episodeId;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -49,8 +58,8 @@ public class ProgramInfo {
         builder.append(getTitle() + '\n');
         builder.append(getDescription() + '\n');
         builder.append(getImageUrl()+ '\n');
-        builder.append(getStartDate()+ '\n');
-        builder.append(getEndDate()+ '\n');
+        builder.append(getStartDate().toString()+ '\n');
+        builder.append(getEndDate().toString()+ '\n');
         return builder.toString();
     }
 }
