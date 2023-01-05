@@ -32,6 +32,15 @@ public class RadioDataModel {
         return parser.getParsedChannels(json);
     }
 
+    public Long getChannelIdByName(String name) {
+        for(Map.Entry<Long,String>item:channels.entrySet()){
+            if(item.getValue().equals(name)){
+                return item.getKey();
+            }
+        }
+        return null;
+    }
+
     public void categorizeChannels() throws IOException, ParseException, InterruptedException {
         String json = api.getChannels();
         this.channels = parser.getParsedChannels(json);
@@ -74,24 +83,16 @@ public class RadioDataModel {
         return primary;
     }
 
-    public List<ProgramInfo> getChannelTableau(String channelName) throws IOException, InterruptedException, ParseException {
+    public List<ProgramInfo> getChannelTableau(Long channelId) throws IOException, InterruptedException, ParseException {
         List<ProgramInfo> sortedList = new ArrayList<>();
-
-        for(Map.Entry<Long,String>item:channels.entrySet()){
-            if(item.getValue().contains(channelName)){
-                List<ProgramInfo> programList = parser.getParsedChannelTableau(api.getChannelTableau(item.getKey()));
-                  for (ProgramInfo program : programList) {
-                    LocalDateTime sixHoursBefore = LocalDateTime.now(ZoneId.systemDefault()).minusHours(6);
-                    LocalDateTime twelveHoursAfter = LocalDateTime.now(ZoneId.systemDefault()).plusHours(12);
-
-                    System.out.println(sixHoursBefore);
-                    if(program.getStartDate().isAfter(sixHoursBefore) && program.getStartDate().isBefore(twelveHoursAfter)){
-                        sortedList.add(program);
-                    }
-                }
-                return sortedList;
+        List<ProgramInfo> programList = parser.getParsedChannelTableau(api.getChannelTableau(channelId));
+          for (ProgramInfo program : programList) {
+            LocalDateTime sixHoursBefore = LocalDateTime.now(ZoneId.systemDefault()).minusHours(6);
+            LocalDateTime twelveHoursAfter = LocalDateTime.now(ZoneId.systemDefault()).plusHours(12);
+            if(program.getStartDate().isAfter(sixHoursBefore) && program.getStartDate().isBefore(twelveHoursAfter)){
+                sortedList.add(program);
             }
-        }
+          }
         return sortedList;
     }
 

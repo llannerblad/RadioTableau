@@ -12,13 +12,14 @@ public class RadioTableauView {
     private JFrame frame;
     private ImageIcon imageStart;
     private JTable table;
-    private JButton button;
+    private JButton refreshButton;
     private JLabel displayField;
     private List<JMenuItem> channelOptions;
+    private JMenuBar menuBar;
+    private JMenu menu;
 
     private MyTableModel model;
-    public RadioTableauView(Map<Long, String> primary, Map<Long, String> p4,
-                            Map<Long, String> extra, Map<Long, String> others){
+    public RadioTableauView(){
 
         channelOptions = new ArrayList<>();
 
@@ -30,9 +31,21 @@ public class RadioTableauView {
 
         frame.add(buildCenterPanel());
 
-        JMenuBar menuBar = new JMenuBar();
+        menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
-        JMenu menu = new JMenu("Välj tablå");
+
+
+        buildTable();
+
+        refreshButton = new JButton("Uppdatera tablå");
+        frame.add(refreshButton, BorderLayout.SOUTH);
+        //frame.add(new JLabel("Tryck på ett program för att visa mer information"), BorderLayout.SOUTH);
+        frame.add(displayField, BorderLayout.NORTH);
+    }
+
+    public void updateMenuBar(Map<Long, String> primary, Map<Long, String> p4,
+                              Map<Long, String> extra, Map<Long, String> others){
+        menu = new JMenu("Välj tablå");
         menuBar.add(menu);
         for(Map.Entry<Long,String>it:primary.entrySet()){
             JMenuItem item = new JMenuItem(it.getValue());
@@ -60,17 +73,9 @@ public class RadioTableauView {
             otherChannels.add(item);
             channelOptions.add(item);
         }
-
-        buildTable();
-
-        button = new JButton("Ta bort bild");
-        button.addActionListener(this::onPressButtonListener);
-        //frame.add(button, BorderLayout.SOUTH);
-        frame.add(new JLabel("Tryck på ett program för att visa mer information"), BorderLayout.SOUTH);
-        frame.add(displayField, BorderLayout.NORTH);
     }
-    private void onPressButtonListener(ActionEvent e) {
-        displayField.setVisible(false);
+    public void addRefreshButtonListener(ActionListener listener){
+        refreshButton.addActionListener(listener);
     }
 
    private void buildTable(){
@@ -78,13 +83,15 @@ public class RadioTableauView {
         table = new JTable(model);
         JScrollPane sp = new JScrollPane(table);
         frame.add(sp);
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println("row" + table.rowAtPoint(e.getPoint()));
-                System.out.println("column" + table.columnAtPoint(e.getPoint()));
-            }
-        });
+    }
+
+    public void showProgramDialog(Icon icon, String description, String title){
+        JOptionPane.showMessageDialog(null, description, title, JOptionPane.INFORMATION_MESSAGE, icon);
+
+    }
+
+    public JTable getTable() {
+        return table;
     }
 
     private JPanel buildCenterPanel(){
@@ -115,4 +122,13 @@ public class RadioTableauView {
     public void addTableMouseListener(MouseListener listener) {
         table.addMouseListener(listener);
     }
+
+    /**
+     * Displays an error message to the user in a pop up dialog.
+     * @param errorMessage the error message to be displayed
+     */
+    public void displayErrorMessage(String errorMessage){
+        JOptionPane.showMessageDialog(frame,errorMessage);
+    }
+
 }

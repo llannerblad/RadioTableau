@@ -16,8 +16,7 @@ public class MyTableModel extends AbstractTableModel {
     public MyTableModel(){
         String[] columnNames ={"Program",
                 "Starttid",
-                "Sluttid",
-                "Visa mer"};
+                "Sluttid"};
         this.columnNames = columnNames;
 
         data = new ArrayList<>();

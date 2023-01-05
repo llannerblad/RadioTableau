@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException, ParseException {
 	// write your code here
         RadioDataModel data = new RadioDataModel();
-        Map<Long, String> channels = data.getChannels();
+        //Map<Long, String> channels = data.getChannels();
         //List<ProgramInfo> list = data.getChannelTableau(164);
 
         /*for(Map.Entry<Long,ProgramInfo>it:map.entrySet()){
