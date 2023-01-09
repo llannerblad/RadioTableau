@@ -28,7 +28,7 @@ public class RadioInfoController {
     private RadioInfoModel model;
     private List<ProgramInfo> currentTableau;
     private String currentChannelName;
-    private CachedChannelTablueax cachedChannelTablueax;
+    private CachedChannelTableaux cachedChannelTableaux;
     private Map<String, Thread> threadPool;
 
     /**
@@ -42,7 +42,7 @@ public class RadioInfoController {
         }
         currentChannelName= null;
         this.threadPool = new HashMap<>();
-        this.cachedChannelTablueax = new CachedChannelTablueax();
+        this.cachedChannelTableaux = new CachedChannelTableaux();
 
         SwingUtilities.invokeLater(() -> {
             this.view = new RadioInfoView();
@@ -133,7 +133,7 @@ public class RadioInfoController {
      */
     private synchronized void runProgramThread(boolean refresh, String channelNameToUpdate) {
         ProgramWorker worker = new ProgramWorker(model, currentChannelName,
-                cachedChannelTablueax, view, refresh, channelNameToUpdate);
+                cachedChannelTableaux, view, refresh, channelNameToUpdate);
         try {
             worker.execute();
             currentTableau = worker.get();

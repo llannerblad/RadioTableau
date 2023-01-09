@@ -18,27 +18,26 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
     private RadioInfoModel model;
     private String channelName;
     private RadioInfoView view;
-    private CachedChannelTablueax cachedChannelTablueax;
+    private CachedChannelTableaux cachedChannelTableaux;
     private boolean refresh;
     private String channelNameToUpdate;
-    private Lock lock;
 
     /**
      * Creates and initializes a new ProgramWorker object.
      * @param model the model object
      * @param currentChannelName the name of the channel that is currently dispayed in the view
-     * @param cachedChannelTablueax the object containing all cached tableaux
+     * @param cachedChannelTableaux the object containing all cached tableaux
      * @param view the view object
      * @param refresh if the tableau should be fetched even though if it is cached
      * @param channelNameToUpdate the name of the channel that is going to be updated
      */
     public ProgramWorker(RadioInfoModel model, String currentChannelName,
-                         CachedChannelTablueax cachedChannelTablueax,
+                         CachedChannelTableaux cachedChannelTableaux,
                          RadioInfoView view, boolean refresh,
                          String channelNameToUpdate){
         this.model = model;
         this.channelName = currentChannelName;
-        this.cachedChannelTablueax = cachedChannelTablueax;
+        this.cachedChannelTableaux = cachedChannelTableaux;
         this.view = view;
         this.refresh = refresh;
         this.channelNameToUpdate = channelNameToUpdate;
@@ -51,7 +50,7 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
      */
     @Override
     protected List<ProgramInfo> doInBackground() {
-       List <ProgramInfo> list = cachedChannelTablueax.getCachedTableau(channelName);
+       List <ProgramInfo> list = cachedChannelTableaux.getCachedTableau(channelName);
        if (list == null || refresh) {
            try {
                list = model.getChannelTableau(model.getChannelIdByName(channelName));
@@ -78,7 +77,7 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
             if(channelNameToUpdate == channelName) {
                 view.updateTableData(get());
             }
-            cachedChannelTablueax.addTableau(get(), channelName);
+            cachedChannelTableaux.addTableau(get(), channelName);
         } catch (InterruptedException | ExecutionException e) {
             view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
         }

@@ -11,13 +11,13 @@ import java.util.Map;
  * Course: Applikationsutveckling (Java)
  * Version information: 2023-01-09
  */
-public class CachedChannelTablueax {
+public class CachedChannelTableaux {
     private Map<String, List<ProgramInfo>> cache;
 
     /**
      * Creates a new CachedChannelTableaux object and initializes @this list.
      */
-    public CachedChannelTablueax(){
+    public CachedChannelTableaux(){
         cache = new HashMap<>();
     }
 

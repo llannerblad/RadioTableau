@@ -137,15 +137,15 @@ public class RadioInfoView {
     }
 
     /**
-     *
-     * @return
+     * Builds a Jpanel with a JLabel that contains information about the program.
+     * @return the program
      */
     private JPanel buildTopPanel() {
         JPanel topPanel = new JPanel();
-        ImageIcon img = new ImageIcon("startbild.png");
-        displayField = new JLabel(img);
         topPanel.setLayout(new BorderLayout());
-        topPanel.add(displayField, BorderLayout.CENTER);
+        topPanel.setPreferredSize(new Dimension(550,80));
+        displayField = new JLabel("1. Välj en kanal i menyn för att visa dess tablå 2. Tryck på ett program för att visa ytterligare information");
+        topPanel.add(displayField);
         return topPanel;
     }
 
