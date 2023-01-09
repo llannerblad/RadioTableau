@@ -33,9 +33,6 @@ public class RadioInfoController {
 
     /**
      * Creates a new RadioTableauController object and initializes its attributes.
-     * @throws IOException when the model can't fetch data
-     * @throws ParseException when the model can't fetch data
-     * @throws InterruptedException when the model can't fetch data
      */
     public RadioInfoController()  {
         try {

@@ -74,7 +74,7 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
      */
     @Override
     protected void done() {
-        List<ProgramInfo> resultData = null;
+        List<ProgramInfo> resultData;
         try {
             resultData = get();
             System.out.println("idone");

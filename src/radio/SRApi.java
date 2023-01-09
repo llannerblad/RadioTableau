@@ -1,26 +1,14 @@
 package radio;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.Timestamp;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+
 
 /**
  * Fetches data from Sveriges Radio's api. The response format is in JSON.
@@ -33,9 +21,8 @@ public class SRApi {
     /**
      * Fetches all available channels.
      * @return the response
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ParseException
+     * @throws IOException if data could not be fetched
+     * @throws InterruptedException if data could not be fetched
      */
     public String getChannels() throws IOException, InterruptedException{
         HttpClient client = HttpClient.newHttpClient();
@@ -54,8 +41,8 @@ public class SRApi {
      * time and twelve hours after.
      * @param channelId the channel's id
      * @return the response
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException if data could not be fetched
+     * @throws InterruptedException if data could not be fetched
      */
     public String getChannelTableau(Long channelId) throws IOException, InterruptedException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

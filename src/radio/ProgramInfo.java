@@ -102,14 +102,13 @@ public class ProgramInfo {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("----Programinformation ---\n");
-        builder.append(getName() + '\n');
-        builder.append(getTitle() + '\n');
-        builder.append(getDescription() + '\n');
-        builder.append(getImageUrl()+ '\n');
-        builder.append(getStartDate().toString()+ '\n');
-        builder.append(getEndDate().toString()+ '\n');
-        return builder.toString();
+        String builder = "----Programinformation ---\n" +
+                getName() + '\n' +
+                getTitle() + '\n' +
+                getDescription() + '\n' +
+                getImageUrl() + '\n' +
+                getStartDate().toString() + '\n' +
+                getEndDate().toString() + '\n';
+        return builder;
     }
 }

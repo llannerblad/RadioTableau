@@ -30,6 +30,11 @@ public class CachedChannelTablueax {
         cache.put(channelName,tableau);
     }
 
+    /**
+     * Returns the cached tableau for the channel
+     * @param channelName the name of the channel
+     * @return the cached tableau
+     */
     public List<ProgramInfo> getCachedTableau(String channelName){
         return cache.get(channelName);
     }
