@@ -22,9 +22,22 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Fetches data from Sveriges Radio's api. The response format is in JSON.
+ * @author Lee Lannerblad (ens19lld)
+ * Course: Applikationsutveckling (Java)
+ * Version information: 2023-01-09
+ */
 public class SRApi {
 
-    public String getChannels() throws IOException, InterruptedException, ParseException {
+    /**
+     * Fetches all available channels.
+     * @return the response
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws ParseException
+     */
+    public String getChannels() throws IOException, InterruptedException{
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .setHeader("Content-Type", "application/json")
@@ -36,6 +49,14 @@ public class SRApi {
         return response.body();
     }
 
+    /**
+     * Fetches the channel with the channelId's tableau. It fetches data from the date that's six hours before current
+     * time and twelve hours after.
+     * @param channelId the channel's id
+     * @return the response
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public String getChannelTableau(Long channelId) throws IOException, InterruptedException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime fromDate= LocalDateTime.now().minusHours(6);
@@ -50,4 +71,5 @@ public class SRApi {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return response.body();
     }
+
 }

@@ -18,10 +18,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Acts as a controller for the application RadioTableau. Controls the communication between RadioTableauModel- and
+ * RadioTableauView object.
+ * @author Lee Lannerblad (ens19lld)
+ * Course: Applikationsutveckling (Java)
+ * Version information: 2023-01-09
+ */
 public class RadioTableauController {
     private static final int HOUR = 3600000;
     private RadioTableauView view;
-    private RadioDataModel dataModel;
+    private RadioTableauModel model;
     private List<ProgramInfo> currentTableau;
     private String currentChannelName;
     private CachedChannelTablueax cachedChannelTablueax;
@@ -29,7 +36,7 @@ public class RadioTableauController {
     private Lock lock;
 
     public RadioTableauController() throws IOException, ParseException, InterruptedException {
-        this.dataModel = new RadioDataModel();
+        this.model = new RadioTableauModel();
         currentChannelName= null;
         this.threadPool = new HashMap<>();
         this.lock = new ReentrantLock();
@@ -37,7 +44,7 @@ public class RadioTableauController {
 
         SwingUtilities.invokeLater(() -> {
             this.view = new RadioTableauView();
-            ChannelWorker channelWorker = new ChannelWorker(dataModel, view, this::onChannelOptionPress);
+            ChannelWorker channelWorker = new ChannelWorker(model, view, this::onChannelOptionPress);
             channelWorker.execute();
             this.view.addTableMouseListener(new ProgramClickAdapter());
             this.view.addRefreshButtonListener(this::onRefreshButtonPress);
@@ -71,7 +78,15 @@ public class RadioTableauController {
             @Override
             public void run() {
                 System.out.println("i run i TimertASk");
-                runProgramThread(true, channelNameToUpdate);
+                try{
+                    if(lock.tryLock()){
+                        runProgramThread(true, channelNameToUpdate);
+                    }
+                } finally {
+                    System.out.println("låser upp");
+                    lock.unlock();
+                }
+
             }
         }, HOUR, HOUR);
     }
@@ -87,7 +102,7 @@ public class RadioTableauController {
     }
 
     private void runProgramThread(boolean refresh, String channelNameToUpdate) {
-        ProgramWorker worker = new ProgramWorker(dataModel, currentChannelName,
+        ProgramWorker worker = new ProgramWorker(model, currentChannelName,
                 cachedChannelTablueax, view, refresh, channelNameToUpdate, lock);
         try {
             worker.execute();

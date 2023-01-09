@@ -3,17 +3,13 @@ package radio;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.*;
 
-public class RadioDataModel {
+public class RadioTableauModel {
 
     private SRParser parser;
-    private SRApi api;
     Map<Long, String> primary;
     Map<Long, String> p4;
     Map<Long, String> extra;
@@ -21,15 +17,9 @@ public class RadioDataModel {
 
     Map<Long, String> channels;
 
-    public RadioDataModel() throws IOException, ParseException, InterruptedException {
+    public RadioTableauModel() throws IOException, ParseException, InterruptedException {
         this.parser = new SRParser();
-        this.api = new SRApi();
         categorizeChannels();
-    }
-
-    public Map getChannels() throws ParseException, IOException, InterruptedException {
-        String json = api.getChannels();
-        return parser.getParsedChannels(json);
     }
 
     public Long getChannelIdByName(String name) {
@@ -42,8 +32,7 @@ public class RadioDataModel {
     }
 
     public void categorizeChannels() throws IOException, ParseException, InterruptedException {
-        String json = api.getChannels();
-        this.channels = parser.getParsedChannels(json);
+        this.channels = parser.getParsedChannels();
         this.primary = new LinkedHashMap<>();
         this.p4 = new LinkedHashMap<>();
         this.extra = new LinkedHashMap<>();
@@ -85,7 +74,7 @@ public class RadioDataModel {
 
     public List<ProgramInfo> getChannelTableau(Long channelId) throws IOException, InterruptedException, ParseException {
         List<ProgramInfo> sortedList = new ArrayList<>();
-        List<ProgramInfo> programList = parser.getParsedChannelTableau(api.getChannelTableau(channelId));
+        List<ProgramInfo> programList = parser.getParsedChannelTableau(channelId);
           for (ProgramInfo program : programList) {
             LocalDateTime sixHoursBefore = LocalDateTime.now(ZoneId.systemDefault()).minusHours(6);
             LocalDateTime twelveHoursAfter = LocalDateTime.now(ZoneId.systemDefault()).plusHours(12);

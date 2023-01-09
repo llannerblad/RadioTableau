@@ -4,18 +4,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Object that is used to maintain cached tableax for channels. Consists of a HashMap where
+ * the key is the channel name and the value is a List of ProgramInfo objects (the tableau)
+ * @author Lee Lannerblad (ens19lld)
+ * Course: Applikationsutveckling (Java)
+ * Version information: 2023-01-09
+ */
 public class CachedChannelTablueax {
-    private Map<String, List<ProgramInfo>> list;
+    private Map<String, List<ProgramInfo>> cache;
 
+    /**
+     * Creates a new CachedChannelTableaux object and initializes @this list.
+     */
     public CachedChannelTablueax(){
-        list = new HashMap<>();
+        cache = new HashMap<>();
     }
 
+    /**
+     * Adds a tableau to cache for the channel with the name channelName.
+     * @param tableau the tableau to cache
+     * @param channelName name of the channel
+     */
     public void addTableau(List<ProgramInfo> tableau, String channelName){
-        list.put(channelName,tableau);
+        cache.put(channelName,tableau);
     }
 
-    public List<ProgramInfo> getCachedTableu(String channelName){
-        return list.get(channelName);
+    public List<ProgramInfo> getCachedTableau(String channelName){
+        return cache.get(channelName);
     }
 }
