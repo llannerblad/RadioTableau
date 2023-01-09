@@ -46,7 +46,7 @@ public class RadioInfoView {
 
     /**
      * Initializes @this menuBar and menu
-     * @return @this menuBar containing @this menu
+     * @return the menu bar that's containing a menu
      */
     private JMenuBar buildMenuBar() {
         menuBar= new JMenuBar();

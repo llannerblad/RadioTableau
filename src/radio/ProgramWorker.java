@@ -51,13 +51,8 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
      */
     @Override
     protected List<ProgramInfo> doInBackground() {
-
-       System.out.println(Thread.currentThread() + "Är i doinbakcground");
-
        List <ProgramInfo> list = cachedChannelTablueax.getCachedTableau(channelName);
-       System.out.println("i doinbackground");
        if (list == null || refresh) {
-           System.out.println("Kommer vi hit?");
            try {
                list = model.getChannelTableau(model.getChannelIdByName(channelName));
            } catch (IOException | ParseException | InterruptedException e) {
@@ -77,7 +72,6 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
         List<ProgramInfo> resultData;
         try {
             resultData = get();
-            System.out.println("idone");
             if(resultData.isEmpty()){
                 view.displayErrorMessage("Hittar inga program för den valda kanalen: " + channelName);
             }

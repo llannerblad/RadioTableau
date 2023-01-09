@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutionException;
  * Version information: 2023-01-09
  */
 public class RadioInfoController {
-    private static final int HOUR = 3600;
+    private static final int HOUR = 3600000;
     private RadioInfoView view;
     private RadioInfoModel model;
     private List<ProgramInfo> currentTableau;

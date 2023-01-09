@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/RadioTablueau.iml" filepath="$PROJECT_DIR$/RadioTablueau.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RadioInfo.iml" filepath="$PROJECT_DIR$/RadioInfo.iml" />
     </modules>
   </component>
 </project>
