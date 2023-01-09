@@ -4,7 +4,6 @@ import org.json.simple.parser.ParseException;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
@@ -16,9 +15,9 @@ import java.util.concurrent.locks.Lock;
  * Version information: 2023-01-09
  */
 public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
-    private RadioTableauModel model;
+    private RadioInfoModel model;
     private String channelName;
-    private RadioTableauView view;
+    private RadioInfoView view;
     private CachedChannelTablueax cachedChannelTablueax;
     private boolean refresh;
     private String channelNameToUpdate;
@@ -32,19 +31,17 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
      * @param view the view object
      * @param refresh if the tableau should be fetched even though if it is cached
      * @param channelNameToUpdate the name of the channel that is going to be updated
-     * @param backgroundLock the lock object to ensure thread safety
      */
-    public ProgramWorker(RadioTableauModel model, String currentChannelName,
+    public ProgramWorker(RadioInfoModel model, String currentChannelName,
                          CachedChannelTablueax cachedChannelTablueax,
-                         RadioTableauView view, boolean refresh,
-                         String channelNameToUpdate, Lock backgroundLock){
+                         RadioInfoView view, boolean refresh,
+                         String channelNameToUpdate){
         this.model = model;
         this.channelName = currentChannelName;
         this.cachedChannelTablueax = cachedChannelTablueax;
         this.view = view;
         this.refresh = refresh;
         this.channelNameToUpdate = channelNameToUpdate;
-        this.lock= backgroundLock;
     }
 
     /**
@@ -54,35 +51,19 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
      */
     @Override
     protected List<ProgramInfo> doInBackground() {
-        List<ProgramInfo> list = new ArrayList<>();
 
+       System.out.println(Thread.currentThread() + "Är i doinbakcground");
+
+       List <ProgramInfo> list = cachedChannelTablueax.getCachedTableau(channelName);
+       System.out.println("i doinbackground");
+       if (list == null || refresh) {
+           System.out.println("Kommer vi hit?");
            try {
-               if(lock.tryLock()) {
-                   System.out.println(Thread.currentThread() + "Är i doinbakcground");
-                   Thread.sleep(1);
-                   list = cachedChannelTablueax.getCachedTableau(channelName);
-                   System.out.println("i doinbackground");
-                   if (list == null || refresh) {
-                       System.out.println("Kommer vi hit?");
-                       try {
-                           list = model.getChannelTableau(model.getChannelIdByName(channelName));
-
-                       } catch (IOException e) {
-                           e.printStackTrace();
-                       } catch (ParseException e) {
-                           e.printStackTrace();
-                       } catch (InterruptedException e) {
-                           e.printStackTrace();
-                       }
-                   }
-               }
-           } catch (InterruptedException e) {
-               throw new RuntimeException(e);
-           } finally {
-               System.out.println("Låserupp");
-               lock.unlock();
+               list = model.getChannelTableau(model.getChannelIdByName(channelName));
+           } catch (IOException | ParseException | InterruptedException e) {
+               view.displayErrorMessage("Kunde inte hämta tablå för: " + channelName);
            }
-
+       }
         return list;
     }
 
@@ -93,29 +74,20 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
      */
     @Override
     protected void done() {
-
+        List<ProgramInfo> resultData = null;
         try {
-            if(lock.tryLock()){
-                List<ProgramInfo> resultData = get();
-                try{
-                    System.out.println("idone");
-                    if(resultData.isEmpty()){
-                        view.displayErrorMessage("Hittar inga program för den valda kanalen: " + channelName);
-                    }
-                    if(channelNameToUpdate == channelName) {
-                        view.updateTableData(get());
-                    }
-                    cachedChannelTablueax.addTableau(get(), channelName);
-                } finally {
-                    lock.unlock();
-                }
+            resultData = get();
+            System.out.println("idone");
+            if(resultData.isEmpty()){
+                view.displayErrorMessage("Hittar inga program för den valda kanalen: " + channelName);
             }
-            else{
-                System.out.println("väntar i done" + Thread.currentThread());
-
+            if(channelNameToUpdate == channelName) {
+                view.updateTableData(get());
             }
+            cachedChannelTablueax.addTableau(get(), channelName);
         } catch (InterruptedException | ExecutionException e) {
-            view.displayErrorMessage("Kunde inte hämta resultat" + e.getMessage());
+            view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
         }
+        }
+
     }
-}

@@ -17,7 +17,7 @@ import java.util.Map;
  * Course: Applikationsutveckling (Java)
  * Version information: 2023-01-09
  */
-public class RadioTableauView {
+public class RadioInfoView {
     private JFrame frame;
     private JTable table;
     private JButton refreshButton;
@@ -25,16 +25,15 @@ public class RadioTableauView {
     private List<JMenuItem> channelOptions;
     private JMenuBar menuBar;
     private JMenu menu;
-    private MyTableModel model;
+    private TableauTableModel model;
 
     /**
      * Creates and initializes a new RadioTableauView object.
      */
-    public RadioTableauView(){
+    public RadioInfoView(){
         channelOptions = new ArrayList<>();
         frame = new JFrame("SR RadioInfo");
         refreshButton = new JButton("Uppdatera tablå");
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(650,550));
         frame.setJMenuBar(buildMenuBar());
@@ -112,7 +111,7 @@ public class RadioTableauView {
      * @return JScrollPane containing content for the Center panel in @this frame
      */
    private JScrollPane buildCenterPanel(){
-        this.model = new MyTableModel();
+        this.model = new TableauTableModel();
         table = new JTable(model);
         return new JScrollPane(table);
     }

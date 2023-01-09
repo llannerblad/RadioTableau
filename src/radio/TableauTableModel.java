@@ -13,14 +13,14 @@ import java.util.List;
  * Course: Applikationsutveckling (Java)
  * Version information: 2023-01-09
  */
-public class MyTableModel extends AbstractTableModel {
+public class TableauTableModel extends AbstractTableModel {
     private String[] columnNames;
     private List<ProgramInfo> tableau;
 
     /**
      * Creates a new MyTableModel object and initializes @this attributes.
      */
-    public MyTableModel(){
+    public TableauTableModel(){
         String[] columnNames ={"Program",
                 "Starttid",
                 "Sluttid"};

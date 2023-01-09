@@ -14,9 +14,9 @@ import java.util.concurrent.ExecutionException;
  * Version information: 2023-01-09
  */
 public class ChannelWorker extends SwingWorker<List<Map<Long, String>>, Void> {
-    private RadioTableauModel model;
+    private RadioInfoModel model;
     private List<Map<Long, String>> channelList;
-    private RadioTableauView view;
+    private RadioInfoView view;
     private ActionListener listener;
 
     /**
@@ -25,7 +25,7 @@ public class ChannelWorker extends SwingWorker<List<Map<Long, String>>, Void> {
      * @param view the view object to be updated
      * @param listener ActionListener to be added to the view's channel options
      */
-    public ChannelWorker(RadioTableauModel model, RadioTableauView view, ActionListener listener){
+    public ChannelWorker(RadioInfoModel model, RadioInfoView view, ActionListener listener){
         this.model = model;
         this.view = view;
         this.listener = listener;
