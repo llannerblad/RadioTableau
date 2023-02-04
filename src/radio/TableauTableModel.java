@@ -92,4 +92,8 @@ public class TableauTableModel extends AbstractTableModel {
         return false;
     }
 
+    public List<ProgramInfo> getTableau(){
+        return tableau;
+    }
+
 }

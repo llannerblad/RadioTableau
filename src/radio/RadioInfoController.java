@@ -1,7 +1,5 @@
 package radio;
 
-import org.json.simple.parser.ParseException;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -9,12 +7,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Acts as a controller for the application RadioTableau. Controls the communication between
@@ -24,20 +20,23 @@ import java.util.concurrent.ExecutionException;
  * Version information: 2023-01-09
  */
 public class RadioInfoController {
-    private static final int HOUR = 3600000;
+    private static final int HOUR = 3600;
     private RadioInfoView view;
     private RadioInfoModel model;
     private List<ProgramInfo> currentTableau;
     private String currentChannelName;
     private CachedChannelTableaux cachedChannelTableaux;
-    private Map<String, Thread> threadPool;
+    private Map<String, Timer> threadPool;
     private ChannelWorker channelWorker;
-    //TODO: Ta bort printsatser
+    //TODO: Ta bort printsatser, cachedChannelTableau är konstigt använt??
+
+    private Object lock;
 
     /**
      * Creates a new RadioTableauController object and initializes its attributes.
      */
     public RadioInfoController()  {
+        this.lock = new Object();
         this.model = new RadioInfoModel();
         currentChannelName= null;
         System.out.println("I main" + Thread.currentThread());
@@ -63,18 +62,17 @@ public class RadioInfoController {
     private void onChannelOptionPress(ActionEvent e) {
         currentChannelName = e.getActionCommand();
         runProgramThread(false, currentChannelName);
-        handleTimerThread();
-
+        handleTimer();
     }
 
     /**
      * If a TimerThread object does not exist for the currentChannel, a new TimerThread is created.
      */
-    private synchronized void handleTimerThread(){
-        if(threadPool.get(currentChannelName) == null) {
-            TimerThread t = new TimerThread(currentChannelName);
-            threadPool.put(currentChannelName,t);
-            t.start();
+    private void handleTimer() {
+        if(cachedChannelTableaux.getCachedTableau(currentChannelName) == null) {
+            timer(currentChannelName);
+            System.out.println("Skapar en ny timer för : " + currentChannelName);
+
         }
     }
 
@@ -84,46 +82,21 @@ public class RadioInfoController {
      * @param e the event to process
      */
     private void onRefreshButtonPress(ActionEvent e) {
-        if(currentTableau != null) {
+        if(currentChannelName != null) {
+            System.out.println("Hej");
             runProgramThread(true, currentChannelName);
         }
     }
 
-
-
-    /**
-     * A thread used for updating a channel's tableau automatically every hour.
-     */
-    private class TimerThread extends Thread {
-        private String channelNameToUpdate;
-
-        /**
-         * Creates a new TimerThread object.
-         * @param channelNameToUpdate the name of the channel to monitor
-         */
-        public TimerThread(String channelNameToUpdate){
-            this.channelNameToUpdate = channelNameToUpdate;
-        }
-
-        /**
-         * Runs the timer method when the thread is executed.
-         */
-        public void run(){
-            timer();
-        }
-
-        /**
-         * Creates a new timer object that runs the method runProgramThread every hour.
-         */
-        private void timer(){
-            Timer t = new Timer();
-            t.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    runProgramThread(true, channelNameToUpdate);
-                }
-            }, HOUR, HOUR);
-        }
+    private void timer(String channelNameToUpdate){
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("Uppdaterar " + channelNameToUpdate + Thread.currentThread());
+                runProgramThread(true, channelNameToUpdate);
+            }
+        }, HOUR, HOUR);
     }
 
 
@@ -133,16 +106,10 @@ public class RadioInfoController {
      * @param refresh if new data should be fetched from the api
      * @param channelNameToUpdate the name of the channel
      */
-    private synchronized void runProgramThread(boolean refresh, String channelNameToUpdate) {
+    private void runProgramThread(boolean refresh, String channelNameToUpdate) {
         ProgramWorker worker = new ProgramWorker(model, currentChannelName,
-                cachedChannelTableaux, view, refresh, channelNameToUpdate);
-        try {
-            worker.execute();
-            currentTableau = worker.get();
-        } catch (ExecutionException | InterruptedException err) {
-            System.out.println(err + "Kunde inte hämta resultat.");
-        }
-
+                cachedChannelTableaux, view, refresh, channelNameToUpdate, lock);
+        worker.execute();
     }
 
     /**
@@ -164,8 +131,8 @@ public class RadioInfoController {
         public void mouseClicked(MouseEvent e){
             view.getTable().setEnabled(false);
             view.getTable().rowAtPoint(e.getPoint());
+            currentTableau = view.getTableData();
             this.program = currentTableau.get(view.getTable().rowAtPoint(e.getPoint()));
-
             showAdditionalInformationAboutProgram();
 
         }

@@ -22,6 +22,8 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
     private boolean refresh;
     private String channelNameToUpdate;
 
+    private Object lock;
+
     /**
      * Creates and initializes a new ProgramWorker object.
      * @param model the model object
@@ -34,13 +36,14 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
     public ProgramWorker(RadioInfoModel model, String currentChannelName,
                          CachedChannelTableaux cachedChannelTableaux,
                          RadioInfoView view, boolean refresh,
-                         String channelNameToUpdate){
+                         String channelNameToUpdate, Object lock) {
         this.model = model;
         this.channelName = currentChannelName;
         this.cachedChannelTableaux = cachedChannelTableaux;
         this.view = view;
         this.refresh = refresh;
         this.channelNameToUpdate = channelNameToUpdate;
+        this.lock = lock;
     }
 
     /**
@@ -50,14 +53,23 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
      */
     @Override
     protected List<ProgramInfo> doInBackground() {
-       List <ProgramInfo> list = cachedChannelTableaux.getCachedTableau(channelName);
-       if (list == null || refresh) {
-           try {
-               list = model.getChannelTableau(model.getChannelIdByName(channelName));
-           } catch (IOException | ParseException | InterruptedException e) {
-               view.displayErrorMessage("Kunde inte hämta tablå för: " + channelName);
-           }
-       }
+        List <ProgramInfo> list;
+
+        synchronized (lock){
+            list = cachedChannelTableaux.getCachedTableau(channelName);
+            if (list == null || refresh) {
+                try {
+                    System.out.println("Uppdaterar tablån");
+                    list = model.getChannelTableau(model.getChannelIdByName(channelName));
+                    cachedChannelTableaux.addTableau(list, channelName);
+                } catch (IOException | ParseException | InterruptedException e) {
+                    view.displayErrorMessage("Kunde inte hämta tablå för: " + channelName);
+                }
+            }
+            else {
+                System.out.println("Uppdaterar inte");
+            }
+        }
         return list;
     }
 
@@ -77,10 +89,10 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
             if(channelNameToUpdate == channelName) {
                 view.updateTableData(get());
             }
-            cachedChannelTableaux.addTableau(get(), channelName);
+
         } catch (InterruptedException | ExecutionException e) {
             view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
         }
-        }
-
     }
+
+}

@@ -175,6 +175,10 @@ public class RadioInfoView {
         model.fireTableDataChanged();
     }
 
+    public List<ProgramInfo> getTableData(){
+        return model.getTableau();
+    }
+
     /**
      * Adds a MouseListener to @this table
      * @param listener the MouseListener
