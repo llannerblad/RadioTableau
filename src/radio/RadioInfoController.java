@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -30,28 +31,29 @@ public class RadioInfoController {
     private String currentChannelName;
     private CachedChannelTableaux cachedChannelTableaux;
     private Map<String, Thread> threadPool;
+    private ChannelWorker channelWorker;
+    //TODO: Ta bort printsatser
 
     /**
      * Creates a new RadioTableauController object and initializes its attributes.
      */
     public RadioInfoController()  {
-        try {
-            this.model = new RadioInfoModel();
-        } catch (IOException | ParseException  | InterruptedException e) {
-            view.displayErrorMessage("Kunde inte hämta kanaler.");
-        }
+        this.model = new RadioInfoModel();
         currentChannelName= null;
+        System.out.println("I main" + Thread.currentThread());
         this.threadPool = new HashMap<>();
         this.cachedChannelTableaux = new CachedChannelTableaux();
 
         SwingUtilities.invokeLater(() -> {
             this.view = new RadioInfoView();
-            ChannelWorker channelWorker = new ChannelWorker(model, view, this::onChannelOptionPress);
+            this.view.show();
+            System.out.println(Thread.currentThread());
+            channelWorker = new ChannelWorker(model, view, this::onChannelOptionPress);
             channelWorker.execute();
             this.view.addTableMouseListener(new ProgramClickAdapter());
             this.view.addRefreshButtonListener(this::onRefreshButtonPress);
-            this.view.show();
         });
+
     }
 
     /**

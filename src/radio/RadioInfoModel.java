@@ -26,13 +26,14 @@ public class RadioInfoModel {
 
     /**
      * Creates a new RadioInfoModel object and initializes attributes.
-     * @throws IOException if data could not be parsed
-     * @throws ParseException if data could not be parsed
-     * @throws InterruptedException if data could not be parsed
+     *
      */
-    public RadioInfoModel() throws IOException, ParseException, InterruptedException {
+    public RadioInfoModel() {
         this.parser = new SRParser();
-        categorizeChannels();
+        this.primary = new LinkedHashMap<>();
+        this.p4 = new LinkedHashMap<>();
+        this.extra = new LinkedHashMap<>();
+        this.others = new LinkedHashMap<>();
     }
 
     /**
@@ -57,10 +58,6 @@ public class RadioInfoModel {
      */
     public void categorizeChannels() throws IOException, ParseException, InterruptedException {
         this.channels = parser.getParsedChannels();
-        this.primary = new LinkedHashMap<>();
-        this.p4 = new LinkedHashMap<>();
-        this.extra = new LinkedHashMap<>();
-        this.others = new LinkedHashMap<>();
 
         for(Map.Entry<Long,String>item:channels.entrySet()){
             if(item.getValue().contains("P1") || item.getValue().contains("P2") || item.getValue().contains("P3")) {

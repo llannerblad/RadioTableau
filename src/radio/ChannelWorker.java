@@ -1,7 +1,11 @@
 package radio;
 
+import org.json.simple.parser.ParseException;
+
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +40,14 @@ public class ChannelWorker extends SwingWorker<List<Map<Long, String>>, Void> {
      * @return the list of categorized channels
      */
     @Override
-    protected List<Map<Long, String>> doInBackground() {
+    protected List<Map<Long, String>> doInBackground() throws InterruptedException, IOException, ParseException {
         this.channelList = new ArrayList<>();
+        model.categorizeChannels();
         channelList.add(model.getPrimary());
         channelList.add(model.getP4());
         channelList.add(model.getExtra());
         channelList.add(model.getOthers());
+        System.out.println(Thread.currentThread());
         return channelList;
     }
 
@@ -61,7 +67,7 @@ public class ChannelWorker extends SwingWorker<List<Map<Long, String>>, Void> {
                 view.addChannelOptionListeners(listener);
             }
         } catch (InterruptedException | ExecutionException e) {
-            view.displayErrorMessage("Kunde inte hämta kanaler" + e.getMessage());
+            view.displayErrorMessage("Kunde inte hämta kanaler: " + e.getMessage());
         }
     }
 }
