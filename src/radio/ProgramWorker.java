@@ -52,22 +52,14 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
      * @return the tableau as a list
      */
     @Override
-    protected List<ProgramInfo> doInBackground() {
+    protected List<ProgramInfo> doInBackground() throws IOException, ParseException, InterruptedException {
         List <ProgramInfo> list;
-
         synchronized (lock){
             list = cachedChannelTableaux.getCachedTableau(channelName);
             if (list == null || refresh) {
-                try {
-                    System.out.println("Uppdaterar tablån");
-                    list = model.getChannelTableau(model.getChannelIdByName(channelName));
-                    cachedChannelTableaux.addTableau(list, channelName);
-                } catch (IOException | ParseException | InterruptedException e) {
-                    view.displayErrorMessage("Kunde inte hämta tablå för: " + channelName);
-                }
-            }
-            else {
-                System.out.println("Uppdaterar inte");
+                System.out.println("Uppdaterar tablån");
+                list = model.getChannelTableau(model.getChannelIdByName(channelName));
+                cachedChannelTableaux.addTableau(list, channelName);
             }
         }
         return list;

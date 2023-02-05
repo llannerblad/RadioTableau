@@ -20,7 +20,7 @@ import java.util.Timer;
  * Version information: 2023-01-09
  */
 public class RadioInfoController {
-    private static final int HOUR = 3600;
+    private static final int HOUR = 3600000;
     private RadioInfoView view;
     private RadioInfoModel model;
     private List<ProgramInfo> currentTableau;
@@ -28,7 +28,7 @@ public class RadioInfoController {
     private CachedChannelTableaux cachedChannelTableaux;
     private Map<String, Timer> threadPool;
     private ChannelWorker channelWorker;
-    //TODO: Ta bort printsatser, cachedChannelTableau är konstigt använt??
+    //TODO: Ta bort printsatser
 
     private Object lock;
 
@@ -39,14 +39,12 @@ public class RadioInfoController {
         this.lock = new Object();
         this.model = new RadioInfoModel();
         currentChannelName= null;
-        System.out.println("I main" + Thread.currentThread());
         this.threadPool = new HashMap<>();
         this.cachedChannelTableaux = new CachedChannelTableaux();
 
         SwingUtilities.invokeLater(() -> {
             this.view = new RadioInfoView();
             this.view.show();
-            System.out.println(Thread.currentThread());
             channelWorker = new ChannelWorker(model, view, this::onChannelOptionPress);
             channelWorker.execute();
             this.view.addTableMouseListener(new ProgramClickAdapter());
@@ -69,10 +67,11 @@ public class RadioInfoController {
      * If a TimerThread object does not exist for the currentChannel, a new TimerThread is created.
      */
     private void handleTimer() {
-        if(cachedChannelTableaux.getCachedTableau(currentChannelName) == null) {
-            timer(currentChannelName);
-            System.out.println("Skapar en ny timer för : " + currentChannelName);
-
+        synchronized (lock) {
+            if(cachedChannelTableaux.getCachedTableau(currentChannelName) == null) {
+                timer(currentChannelName);
+                System.out.println("Skapar en ny timer för : " + currentChannelName);
+            }
         }
     }
 
@@ -83,7 +82,6 @@ public class RadioInfoController {
      */
     private void onRefreshButtonPress(ActionEvent e) {
         if(currentChannelName != null) {
-            System.out.println("Hej");
             runProgramThread(true, currentChannelName);
         }
     }
@@ -134,7 +132,6 @@ public class RadioInfoController {
             currentTableau = view.getTableData();
             this.program = currentTableau.get(view.getTable().rowAtPoint(e.getPoint()));
             showAdditionalInformationAboutProgram();
-
         }
 
         /**
