@@ -54,7 +54,7 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
     @Override
     protected List<ProgramInfo> doInBackground() throws IOException, ParseException, InterruptedException {
         List <ProgramInfo> list;
-        synchronized (lock){
+        synchronized (lock) {
             list = cachedChannelTableaux.getCachedTableau(channelName);
             if (list == null || refresh) {
                 list = model.getChannelTableau(model.getChannelIdByName(channelName));
@@ -80,9 +80,17 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
             if(channelNameToUpdate == channelName) {
                 view.updateTableData(get());
             }
-
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            System.out.println(cause);
+            if (cause instanceof ParseException) {
+                view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
+            }
+            if (cause instanceof IOException) {
+                view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
+            }
         }
     }
 }

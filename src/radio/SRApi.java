@@ -24,7 +24,7 @@ public class SRApi {
      * @throws IOException if data could not be fetched
      * @throws InterruptedException if data could not be fetched
      */
-    public String getChannels() throws IOException, InterruptedException{
+    public String getChannels() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .setHeader("Content-Type", "application/json")

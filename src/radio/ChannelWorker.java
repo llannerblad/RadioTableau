@@ -40,14 +40,13 @@ public class ChannelWorker extends SwingWorker<List<Map<Long, String>>, Void> {
      * @return the list of categorized channels
      */
     @Override
-    protected List<Map<Long, String>> doInBackground() throws InterruptedException, IOException, ParseException {
+    protected List<Map<Long, String>> doInBackground() throws IOException, ParseException, InterruptedException {
         this.channelList = new ArrayList<>();
         model.categorizeChannels();
         channelList.add(model.getPrimary());
         channelList.add(model.getP4());
         channelList.add(model.getExtra());
         channelList.add(model.getOthers());
-        System.out.println(Thread.currentThread());
         return channelList;
     }
 
@@ -66,8 +65,17 @@ public class ChannelWorker extends SwingWorker<List<Map<Long, String>>, Void> {
                 view.setMenuBar(channelList.get(0), channelList.get(1), channelList.get(2), channelList.get(3));
                 view.addChannelOptionListeners(listener);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            view.displayErrorMessage("Kunde inte hämta kanaler: " + e.getMessage());
+        } catch (InterruptedException e) {
+            view.displayErrorMessage("Kunde inte hämta kanaler (InterruptedException): " + e.getMessage());
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            System.out.println(cause);
+            if(cause instanceof ParseException) {
+                view.displayErrorMessage("Kunde inte hämta kanaler (ParseException):  " + e.getMessage());
+            }
+            if(cause instanceof IOException) {
+                view.displayErrorMessage("Kunde inte hämta kanaler (IOException):  " + e.getMessage());
+            }
         }
     }
 }

@@ -20,16 +20,13 @@ import java.util.Timer;
  * Version information: 2023-01-09
  */
 public class RadioInfoController {
-    private static final int HOUR = 36000;
+    private static final int HOUR = 3600000;
     private RadioInfoView view;
     private RadioInfoModel model;
     private List<ProgramInfo> currentTableau;
     private String currentChannelName;
     private CachedChannelTableaux cachedChannelTableaux;
-    private Map<String, Timer> threadPool;
     private ChannelWorker channelWorker;
-    //TODO: Ta bort printsatser
-
     private Object lock;
 
     /**
@@ -39,7 +36,6 @@ public class RadioInfoController {
         this.lock = new Object();
         this.model = new RadioInfoModel();
         currentChannelName= null;
-        this.threadPool = new HashMap<>();
         this.cachedChannelTableaux = new CachedChannelTableaux();
 
         SwingUtilities.invokeLater(() -> {
@@ -67,8 +63,9 @@ public class RadioInfoController {
      */
     private void handleTimer() {
         synchronized (lock) {
+            String temp = currentChannelName;
             if(cachedChannelTableaux.getCachedTableau(currentChannelName) == null) {
-                timer(currentChannelName);
+                timer(temp);
             }
         }
     }
