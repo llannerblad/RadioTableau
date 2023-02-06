@@ -57,7 +57,6 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
         synchronized (lock){
             list = cachedChannelTableaux.getCachedTableau(channelName);
             if (list == null || refresh) {
-                System.out.println("Uppdaterar tablån");
                 list = model.getChannelTableau(model.getChannelIdByName(channelName));
                 cachedChannelTableaux.addTableau(list, channelName);
             }
@@ -86,5 +85,4 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
             view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
         }
     }
-
 }

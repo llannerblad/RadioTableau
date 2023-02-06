@@ -20,7 +20,7 @@ import java.util.Timer;
  * Version information: 2023-01-09
  */
 public class RadioInfoController {
-    private static final int HOUR = 3600000;
+    private static final int HOUR = 36000;
     private RadioInfoView view;
     private RadioInfoModel model;
     private List<ProgramInfo> currentTableau;
@@ -50,7 +50,6 @@ public class RadioInfoController {
             this.view.addTableMouseListener(new ProgramClickAdapter());
             this.view.addRefreshButtonListener(this::onRefreshButtonPress);
         });
-
     }
 
     /**
@@ -64,15 +63,28 @@ public class RadioInfoController {
     }
 
     /**
-     * If a TimerThread object does not exist for the currentChannel, a new TimerThread is created.
+     * If a timer object does not exist for the currentChannel, a new TimerThread is created.
      */
     private void handleTimer() {
         synchronized (lock) {
             if(cachedChannelTableaux.getCachedTableau(currentChannelName) == null) {
                 timer(currentChannelName);
-                System.out.println("Skapar en ny timer för : " + currentChannelName);
             }
         }
+    }
+
+    /**
+     * Creates a new Timer object for the specified channel
+     * @param channelToUpdate the name of the channel
+     */
+    private void timer(String channelToUpdate){
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runProgramThread(true, channelToUpdate);
+            }
+        }, HOUR, HOUR);
     }
 
     /**
@@ -85,18 +97,6 @@ public class RadioInfoController {
             runProgramThread(true, currentChannelName);
         }
     }
-
-    private void timer(String channelNameToUpdate){
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                System.out.println("Uppdaterar " + channelNameToUpdate + Thread.currentThread());
-                runProgramThread(true, channelNameToUpdate);
-            }
-        }, HOUR, HOUR);
-    }
-
 
     /**
      * Runs the background thread that is responsible for updating and/or show a channel's tableau
@@ -159,7 +159,7 @@ public class RadioInfoController {
                 view.getTable().setEnabled(true);
 
             } catch (IOException err) {
-                view.displayErrorMessage("Kunde inte hämta visa ytterligare information");
+                view.displayErrorMessage("Kunde inte visa ytterligare information");
             }
         }
     }

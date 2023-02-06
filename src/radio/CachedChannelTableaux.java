@@ -38,4 +38,12 @@ public class CachedChannelTableaux {
     public List<ProgramInfo> getCachedTableau(String channelName){
         return cache.get(channelName);
     }
+
+    public void print(){
+        for(String info: cache.keySet()){
+            String key = info.toString();
+            String p = cache.get(key).toString();
+            System.out.println(key + " " + p);
+        }
+    }
 }
