@@ -17,7 +17,7 @@ import java.util.Timer;
  * RadioTableauModel- and RadioTableauView object.
  * @author Lee Lannerblad (ens19lld)
  * Course: Applikationsutveckling (Java)
- * Version information: 2023-01-09
+ * Version information: 2023-02-07
  */
 public class RadioInfoController {
     private static final int HOUR = 3600000;

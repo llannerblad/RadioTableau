@@ -13,7 +13,7 @@ import java.util.*;
  * Divides channel's into four categories, primary, p4, extra and others.
  * @author Lee Lannerblad (ens19lld)
  * Course: Applikationsutveckling (Java)
- * Version information: 2023-01-09
+ * Version information: 2023-02-07
  */
 public class RadioInfoModel {
 

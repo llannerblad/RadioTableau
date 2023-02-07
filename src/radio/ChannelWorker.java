@@ -1,11 +1,9 @@
 package radio;
 
 import org.json.simple.parser.ParseException;
-
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +13,7 @@ import java.util.concurrent.ExecutionException;
  * Background thread for getting a List of the channels of Sveriges Radio.
  * @author Lee Lannerblad (ens19lld)
  * Course: Applikationsutveckling (Java)
- * Version information: 2023-01-09
+ * Version information: 2023-02-07
  */
 public class ChannelWorker extends SwingWorker<List<Map<Long, String>>, Void> {
     private RadioInfoModel model;
@@ -40,13 +38,16 @@ public class ChannelWorker extends SwingWorker<List<Map<Long, String>>, Void> {
      * @return the list of categorized channels
      */
     @Override
-    protected List<Map<Long, String>> doInBackground() throws IOException, ParseException, InterruptedException {
+    protected List<Map<Long, String>> doInBackground() throws IOException, ParseException, InterruptedException, NullPointerException {
         this.channelList = new ArrayList<>();
         model.categorizeChannels();
         channelList.add(model.getPrimary());
         channelList.add(model.getP4());
         channelList.add(model.getExtra());
         channelList.add(model.getOthers());
+        if(channelList.isEmpty()){
+            throw new NullPointerException("Inga kanaler fanns att hämta.");
+        }
         return channelList;
     }
 
@@ -58,23 +59,20 @@ public class ChannelWorker extends SwingWorker<List<Map<Long, String>>, Void> {
     protected void done() {
         try {
             List<Map<Long, String>> channelList = get();
-            if(channelList.isEmpty()){
-                view.displayErrorMessage("Kunde inte hämta kanaler.");
-            }
-            else{
-                view.setMenuBar(channelList.get(0), channelList.get(1), channelList.get(2), channelList.get(3));
-                view.addChannelOptionListeners(listener);
-            }
+            view.setMenuBar(channelList.get(0), channelList.get(1), channelList.get(2), channelList.get(3));
+            view.addChannelOptionListeners(listener);
         } catch (InterruptedException e) {
             view.displayErrorMessage("Kunde inte hämta kanaler (InterruptedException): " + e.getMessage());
         } catch (ExecutionException e) {
             Throwable cause = e.getCause();
-            System.out.println(cause);
             if(cause instanceof ParseException) {
                 view.displayErrorMessage("Kunde inte hämta kanaler (ParseException):  " + e.getMessage());
             }
             if(cause instanceof IOException) {
                 view.displayErrorMessage("Kunde inte hämta kanaler (IOException):  " + e.getMessage());
+            }
+            if (cause instanceof NullPointerException) {
+                view.displayErrorMessage(cause.getMessage());
             }
         }
     }

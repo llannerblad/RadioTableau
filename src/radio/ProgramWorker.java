@@ -1,18 +1,16 @@
 package radio;
 
 import org.json.simple.parser.ParseException;
-
 import javax.swing.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.Lock;
 
 /**
  * Background thread for getting a channel's tableau.
  * @author Lee Lannerblad (ens19lld)
  * Course: Applikationsutveckling (Java)
- * Version information: 2023-01-09
+ * Version information: 2023-02-07
  */
 public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
     private RadioInfoModel model;
@@ -21,7 +19,6 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
     private CachedChannelTableaux cachedChannelTableaux;
     private boolean refresh;
     private String channelNameToUpdate;
-
     private Object lock;
 
     /**
@@ -52,13 +49,17 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
      * @return the tableau as a list
      */
     @Override
-    protected List<ProgramInfo> doInBackground() throws IOException, ParseException, InterruptedException {
+    protected List<ProgramInfo> doInBackground() throws IOException, ParseException, InterruptedException, NullPointerException {
         List <ProgramInfo> list;
         synchronized (lock) {
             list = cachedChannelTableaux.getCachedTableau(channelName);
             if (list == null || refresh) {
                 list = model.getChannelTableau(model.getChannelIdByName(channelName));
                 cachedChannelTableaux.addTableau(list, channelName);
+
+                if(list.isEmpty()) {
+                    throw new NullPointerException("Hittar inga program för den valda kanalen: " + channelName);
+                }
             }
         }
         return list;
@@ -74,22 +75,21 @@ public class ProgramWorker extends SwingWorker<List<ProgramInfo>, Void> {
         List<ProgramInfo> resultData;
         try {
             resultData = get();
-            if(resultData.isEmpty()){
-                view.displayErrorMessage("Hittar inga program för den valda kanalen: " + channelName);
-            }
-            if(channelNameToUpdate == channelName) {
-                view.updateTableData(get());
+            if (channelNameToUpdate == channelName) {
+                view.updateTableData(resultData);
             }
         } catch (InterruptedException e) {
             view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
         } catch (ExecutionException e) {
             Throwable cause = e.getCause();
-            System.out.println(cause);
             if (cause instanceof ParseException) {
                 view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
             }
             if (cause instanceof IOException) {
                 view.displayErrorMessage("Kunde inte hämta resultat för: " + channelName);
+            }
+            if (cause instanceof NullPointerException) {
+                view.displayErrorMessage(cause.getMessage());
             }
         }
     }
